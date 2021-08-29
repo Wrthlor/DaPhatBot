@@ -141,7 +141,9 @@ public class DaPhatBot {
                             "How **Tidecaller** works: \n" +
                             "• Zero hits = *Tap*\n" +
                             "• Two (or more) hits = *Full* = *\"Perfect\"* (A1 Talent)")
-                        .addField("\u200B", "*Base dmg:*\n*Crit dmg:*\n*Avg dmg:*", true)   // Using Unicode "zero width space" as empty "String name" filler
+                        .addField("\u200B", "*Base damage:*\n" +
+                            "*Critical hit damage:*\n" +
+                            "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler
                         .addField("*Tap*", tap[0] + "\n" + tap[1] + "\n" + tap[2], true)
                         .addField("*Full / Perfect*", perfect[0] + "\n" + perfect[1] + "\n" + perfect[2], true)
                         .setFooter("Bot by DaPhatWan#5333", "")
@@ -167,9 +169,26 @@ public class DaPhatBot {
             DamageOperator checkInput = new DamageOperator(command, parameters);
             String status = checkInput.checkFormat();
             if (status.equals("Success")) {
+                Beidou parry = checkInput.getBeidou();
+                int[] ult = parry.calculateUlt();
+
                 event.getMessage()
                     .getChannel().block()
-                    .createMessage("Work in progress! Check back later!").block();
+                    .createEmbed(spec -> spec.setColor(Color.VIVID_VIOLET)
+                        .setTitle("Stormbreaker Damage")
+                        .setUrl("https://genshin-impact.fandom.com/wiki/Stormbreaker")
+                        .setDescription("Assumptions: \n" +
+                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
+                            "• Enemy has `RES = 10%` \n" +
+                            "How **Stormbreaker** works: \n" +
+                            "• Damage calculated *per* discharge \n" +
+                            "• Multiply by number of jumps and discharges for total damage")
+                        .addField("\u200B", "*Base damage:*\n" +
+                            "*Critical hit damage:*\n" +
+                            "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler
+                        .addField("*Lightning Damage*", ult[0] + "\n" + ult[1] + "\n" + ult[2], true)
+                        .setFooter("Bot by DaPhatWan#5333", "")
+                    ).block();
             }
             else {
                 event.getMessage()
