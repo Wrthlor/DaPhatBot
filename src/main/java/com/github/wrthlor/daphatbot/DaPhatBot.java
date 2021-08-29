@@ -93,9 +93,12 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
                         .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
-                        .addField("*Base dmg* ", base, true)
-                        .addField("*Crit dmg* ", crit, true)
-                        .addField("*Avg dmg* ", avg, true)
+                        .setDescription("Calculated results are for ***raw*** damage output. \n" +
+                            "Enemy DEF/RES values and level differences are not taken into account. \n" +
+                            "Click link to see in-depth calculations. ")
+                        .addField("*Base damage* ", base, true)
+                        .addField("*Critical hit damage* ", crit, true)
+                        .addField("*Average damage output* ", avg, true)
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
@@ -104,6 +107,7 @@ public class DaPhatBot {
                     .getChannel().block()
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
+                        .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
                         .setDescription(status)
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
