@@ -1,2 +1,5 @@
-# IntelliJ Project specific settings
+### Maven ###
+target/
+
+### IntelliJ IDEA ###
 .idea/
