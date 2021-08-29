@@ -93,9 +93,11 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
                         .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
-                        .setDescription("Calculated results are for ***raw*** damage output. \n" +
-                            "Enemy DEF/RES values and level differences are not taken into account. \n" +
-                            "Click link to see in-depth calculations. ")
+                        .setDescription("Assumptions: \n" +
+                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
+                            "• Enemy has `RES = 10%` \n" +
+                            "• Talents are **NOT** factored. Please check wiki/in-game to determine Talent% multiplier \n" +
+                            "• Click link for more details")
                         .addField("*Base damage* ", base, true)
                         .addField("*Critical hit damage* ", crit, true)
                         .addField("*Average damage output* ", avg, true)
@@ -133,11 +135,15 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.VIVID_VIOLET)
                         .setTitle("Tidecaller Damage")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Tidecaller")
-                        .setDescription("• Zero hits = *Tap*\n" +
+                        .setDescription("Assumptions: \n" +
+                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
+                            "• Enemy has `RES = 10%` \n" +
+                            "How **Tidecaller** works: \n" +
+                            "• Zero hits = *Tap*\n" +
                             "• Two (or more) hits = *Full* = *\"Perfect\"* (A1 Talent)")
                         .addField("\u200B", "*Base dmg:*\n*Crit dmg:*\n*Avg dmg:*", true)   // Using Unicode "zero width space" as empty "String name" filler
                         .addField("*Tap*", tap[0] + "\n" + tap[1] + "\n" + tap[2], true)
-                        .addField("*Full*", perfect[0] + "\n" + perfect[1] + "\n" + perfect[2], true)
+                        .addField("*Full / Perfect*", perfect[0] + "\n" + perfect[1] + "\n" + perfect[2], true)
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
