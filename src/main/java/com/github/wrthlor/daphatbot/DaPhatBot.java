@@ -32,8 +32,8 @@ public class DaPhatBot {
                 final String content = event.getMessage().getContent();
 
                 for (final Map.Entry<String, Command> entry : commands.entrySet()) {
-                    // We will be using ! as our "prefix" to any command in the system.
-                    if (content.startsWith('!' + entry.getKey())) {
+                    // We will be using p! as our "prefix" to any command in the system.
+                    if (content.startsWith("p!" + entry.getKey())) {
                         entry.getValue().execute(event);
                         break;
                     }
@@ -55,29 +55,27 @@ public class DaPhatBot {
     private static final Map<String, Command> commands = new HashMap<>();
 
     static {
-        commands.put("ping", event -> event.getMessage()
+        commands.put("help", event -> event.getMessage()
             .getChannel().block()
             // 0xe6e6fa = Lavender
             .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
-                .setTitle("Ping Pong")
-                .setDescription("Pong!")
+                .setTitle("DPS calculator commands")
+                .addField("General DPS command",
+                    "`p!damage` - Calculates expected output damage, ignoring talents \n" +
+                    "⤷ Format: `p!damage ATK DMG% CRIT_Rate CRIT_DMG` ", false)
+                .addField("Beidou specific commands",
+                    "`p!parry` - Calculates expected Tidecaller damage \n" +
+                    "⤷ Format: `p!parry ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl` \n" +
+                    "`p!ult` - Calculates expected Stormbreaker damage \n" +
+                    "⤷ Format: `p!ult ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl` ", false)
                 .setFooter("Bot by DaPhatWan#5333", "")
                 .setTimestamp(Instant.now())
             ).block());
 
-        // Testing ability to get caller's username
-        commands.put("helloBot", event -> {
-            User user = event.getMessage().getAuthor().get();
-            String username = user.getUsername() + "#" + user.getDiscriminator();
-            event.getMessage()
-                .getChannel().block()
-                .createMessage("What do you want @" + username + "?").block();
-        });
-
         commands.put("damage", event -> {
             String input = event.getMessage().getContent().trim();
-            String command = input.substring(1, 7);
-            String parameters = input.substring(7);
+            String command = input.substring(0, 8);
+            String parameters = input.substring(8);
 
             DamageOperator checkInput = new DamageOperator(command, parameters);
             String status = checkInput.checkFormat();
@@ -96,7 +94,7 @@ public class DaPhatBot {
                         .setDescription("Assumptions: \n" +
                             "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
                             "• Enemy has `RES = 10%` \n" +
-                            "• Talents are **NOT** factored. Please check wiki/in-game to determine Talent% multiplier \n" +
+                            "• Talents are **NOT** factored. Please check wiki/in-game to get Talent% multiplier \n" +
                             "• Click link for more details")
                         .addField("*Base damage* ", base, true)
                         .addField("*Critical hit damage* ", crit, true)
@@ -118,8 +116,8 @@ public class DaPhatBot {
 
         commands.put("parry", event -> {
             String input = event.getMessage().getContent().trim();
-            String command = input.substring(1, 6);
-            String parameters = input.substring(6);
+            String command = input.substring(0, 7);
+            String parameters = input.substring(7);
 
             DamageOperator checkInput = new DamageOperator(command, parameters);
             String status = checkInput.checkFormat();
@@ -163,8 +161,8 @@ public class DaPhatBot {
 
         commands.put("ult", event -> {
             String input = event.getMessage().getContent().trim();
-            String command = input.substring(1, 4);
-            String parameters = input.substring(4);
+            String command = input.substring(0, 5);
+            String parameters = input.substring(5);
 
             DamageOperator checkInput = new DamageOperator(command, parameters);
             String status = checkInput.checkFormat();

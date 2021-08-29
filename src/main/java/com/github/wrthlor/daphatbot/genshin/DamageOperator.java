@@ -25,27 +25,27 @@ public class DamageOperator {
         String regex = "\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+";
         for (String nums : numbers) {
             if (!nums.matches(regex)) {
-                if (this.command.equals("damage")) {
-                    return "Please use format: \n`!damage ATK DMG% CRIT_Rate CRIT_DMG`";
+                if (this.command.equals("p!damage")) {
+                    return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG`";
                 }
                 else {
-                    return "Please use format: \n`!damage ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
+                    return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
                 }
             }
         }
 
         // Damage command
-        if (this.command.equals("damage")) {
+        if (this.command.equals("p!damage")) {
             if (numbers.length != 4) {
-                return "Please use format: \n`!damage ATK DMG% CRIT_Rate CRIT_DMG`";
+                return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG`";
             }
         }
 
         // Beidou commands
-        if (this.command.equals("parry") || this.command.equals("ult")) {
+        if (this.command.equals("p!parry") || this.command.equals("ult")) {
             // Checks for 5 inputs (5th = talent level)
             if (numbers.length != 5) {
-                return "Please use format: \n`!damage ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
+                return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
             }
 
             // Checks talent level input is within reachable values: 1-13 inclusive
