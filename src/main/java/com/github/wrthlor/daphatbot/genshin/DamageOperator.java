@@ -42,7 +42,7 @@ public class DamageOperator {
         }
 
         // Beidou commands
-        if (this.command.equals("p!parry") || this.command.equals("ult")) {
+        if (this.command.equals("p!parry") || this.command.equals("p!ult")) {
             // Checks for 5 inputs (5th = talent level)
             if (numbers.length != 5) {
                 return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
