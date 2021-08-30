@@ -13,8 +13,7 @@ public class Beidou extends GenshinDamageCalculator {
     final private double[] lightning = {96, 103, 110, 120, 127, 134, 144, 154, 163, 173, 182, 192, 203};
 
     public Beidou() {
-        this.totalAttack = this.damagePercent = this.critRate = this.critDamage = 0;
-        this.talent = 1;
+        this(0, 0, 0, 0, 1);
     }
 
     public Beidou(double attack, double dmgBonus, double cRate, double cDmg, int level) {
@@ -28,9 +27,9 @@ public class Beidou extends GenshinDamageCalculator {
     // Shows given stats
     @Override
     public String toString() {
-        return "ATK: " + this.totalAttack +  "\nDMG%: " + this.damagePercent + "%"
-            + "\nCRIT_Rate: " + this.critRate + "%\nCRIT_DMG: " + this.critDamage + "%"
-            + "\nTalent_lvl: " + this.talent;
+        return "ATK: " + this.totalAttack +  "\nDMG%: " + this.damagePercent + "%\n"
+            + "CRIT_Rate: " + this.critRate + "%\nCRIT_DMG: " + this.critDamage + "%\n"
+            + "Talent_lvl: " + this.talent;
     }
 
     // Calculates Tidecaller damage with respective number of hits absorbed
