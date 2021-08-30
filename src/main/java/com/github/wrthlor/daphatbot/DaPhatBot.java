@@ -19,7 +19,14 @@ public class DaPhatBot {
 
     public static void main(String[] args) {
 
-        final GatewayDiscordClient client = DiscordClientBuilder.create(args[0]).build()
+        // Use Heroku's environment file to store Discord bot token
+        String token = System.getenv("TOKEN");
+        // If argument for token is provided, use that instead
+        if (args.length > 0) {
+            token = args[0];
+        }
+
+        final GatewayDiscordClient client = DiscordClientBuilder.create(token).build()
             .login()
             .block();
 
