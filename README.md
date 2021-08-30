@@ -18,3 +18,4 @@ Done in Java, utilizing Discord4J
 ## Acknowledgements 
 * [Discord Bot API](https://discord.com/developers/docs/intro)
 * [Discord4J](https://github.com/Discord4J/Discord4J)
+* [Keqing Mains Damage Formula](https://library.keqingmains.com/mechanics/combat/damage-formula)
