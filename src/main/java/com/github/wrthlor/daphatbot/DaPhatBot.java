@@ -12,6 +12,7 @@ import discord4j.rest.util.Color;
 
 // Java packages
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,8 @@ public class DaPhatBot {
 
         // Use Heroku's environment file to store Discord bot token
         String token = System.getenv("TOKEN");
-        // If argument for token is provided, use that instead
+        // If argument for token is provided, use that instead 
+		// Primarily for local testing
         if (args.length > 0) {
             token = args[0];
         }
@@ -31,15 +33,11 @@ public class DaPhatBot {
             .block();
 
         client.getEventDispatcher().on(MessageCreateEvent.class)
-            // subscribe is like block, in that it will *request* for action
-            // to be done, but instead of blocking the thread, waiting for it
-            // to finish, it will just execute the results asynchronously.
             .subscribe(event -> {
-                // 3.1 Message.getContent() is a String
                 final String content = event.getMessage().getContent();
 
                 for (final Map.Entry<String, Command> entry : commands.entrySet()) {
-                    // We will be using p! as our "prefix" to any command in the system.
+                    // Using p! as our "prefix" to any command in the system
                     if (content.startsWith("p!" + entry.getKey())) {
                         entry.getValue().execute(event);
                         break;
@@ -47,6 +45,7 @@ public class DaPhatBot {
                 }
             });
 
+		// Console output for clarity and tracking
         client.getEventDispatcher().on(ReadyEvent.class)
             .subscribe(event -> {
                 final User self = event.getSelf();
@@ -62,29 +61,38 @@ public class DaPhatBot {
     private static final Map<String, Command> commands = new HashMap<>();
 
     static {
-        commands.put("help", event -> event.getMessage()
-            .getChannel().block()
-            // 0xe6e6fa = Lavender
-            .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
-                .setTitle("DPS calculator commands")
-                .addField("General DPS command",
-                    "`p!damage` - Calculates expected output damage, ignoring talents \n" +
-                    "⤷ Format: `p!damage ATK DMG% CRIT_Rate CRIT_DMG` ", false)
-                .addField("Beidou specific commands",
-                    "`p!parry` - Calculates expected Tidecaller damage \n" +
-                    "⤷ Format: `p!parry ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl` \n" +
-                    "`p!ult` - Calculates expected Stormbreaker damage \n" +
-                    "⤷ Format: `p!ult ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl` ", false)
-                .setFooter("Bot by DaPhatWan#5333", "")
-                .setTimestamp(Instant.now())
-            ).block());
+        // p!help command - Displays all available commands
+        commands.put("help", event -> {
+            String dpsMessages = "`p!damage` - Gets expected output damage, ignoring talents \n" +
+                "⤷ Format: `p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n"+
+                "`p!calcRes` - Gets enemy resistance *multiplier* \n" +
+                "⤷ Format: `p!calcRes Enemy_RES` \n"+
+                "`p!calcDef` - Gets enemy defense *multiplier* \n" +
+                "⤷ Format: `p!calcDef Char_lvl Enemy_lvl [DEF_Reduction]` ";
+            String beidouMessages = "`p!parry` - Gets expected Tidecaller damage \n" +
+                "⤷ Format: `p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
+                "`p!ult` - Gets expected Stormbreaker damage \n" +
+                "⤷ Format: `p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` ";
 
+            event.getMessage()
+                .getChannel().block()
+                // 0xe6e6fa = Lavender
+                .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                    .setTitle("DPS calculator commands")
+                    .addField("General DPS command", dpsMessages, false)
+                    .addField("Beidou specific commands", beidouMessages, false)
+                    .setFooter("Bot by DaPhatWan#5333", "")
+                    .setTimestamp(Instant.now())
+                ).block();
+        });
+
+        // p!damage command - calculates expected damage output (ignores talent)
         commands.put("damage", event -> {
             String input = event.getMessage().getContent().trim();
             String command = input.substring(0, 8);
             String parameters = input.substring(8);
 
-            DamageOperator checkInput = new DamageOperator(command, parameters);
+            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
             String status = checkInput.checkFormat();
             if (status.equals("Success")) {
 
@@ -121,12 +129,106 @@ public class DaPhatBot {
             }
         });
 
+        // p!calcRes command - calculates RES multiplier for damage equation
+        commands.put("calcRes", event -> {
+            String input = event.getMessage().getContent().trim();
+            String command = input.substring(0, 9);
+            String parameters = input.substring(9);
+
+            // p!calcRes Enemy_RES
+            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
+            String status = checkInput.checkFormat();
+
+            if (status.equals("Success")) {
+                GenshinDamageCalculator resistance = new GenshinDamageCalculator();
+
+                String paramValue = checkInput.getNumbers()[0];
+                double output = resistance.calculateResistanceMultiplier(Double.parseDouble(paramValue));
+
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Resistance Multiplier")
+                        .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
+                        .setDescription("Enemy resistance: " + paramValue + "%\n" +
+                            "\n**RES multiplier:** " + String.format("%.4f", output))
+                        .setFooter("Bot by DaPhatWan#5333", ""))
+                    .block();
+            }
+            else {
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Resistance Multiplier")
+                        .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
+                        .setDescription(status)
+                        .setFooter("Bot by DaPhatWan#5333", "")
+                    ).block();
+            }
+
+        });
+
+        // p!calcDef command - calculates DEF multiplier for damage equation
+        commands.put("calcDef", event -> {
+            String input = event.getMessage().getContent().trim();
+            String command = input.substring(0, 9);
+            String parameters = input.substring(9);
+
+            // p!calcDef charLvl defLvl [defShred]
+            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
+            String status = checkInput.checkFormat();
+
+            if (status.equals("Success")) {
+                GenshinDamageCalculator defense = new GenshinDamageCalculator();
+
+                ArrayList<Double> paramValues = new ArrayList<>();
+                for (String nums : checkInput.getNumbers()) {
+                    paramValues.add(Double.valueOf(nums));
+                }
+
+                double output;
+                String extra = "";
+                if (paramValues.size() == 3) {
+                    output = defense.calculateDefenseMultiplier(paramValues.get(0), paramValues.get(1), paramValues.get(2));
+                    extra = "\nDefense reduction: " + paramValues.get(2) + "%";
+                }
+                else {
+                    output = defense.calculateDefenseMultiplier(paramValues.get(0), paramValues.get(1));
+                    extra = "";
+                }
+
+                String description = "Character level: " + paramValues.get(0) +
+                    "\nEnemy level: " + paramValues.get(1) + extra +
+                    "\n\n**DEF multiplier:** " + String.format("%.4f", output);
+
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Defense Multiplier")
+                        .setUrl("https://genshin-impact.fandom.com/wiki/Defense#Enemy_Defense")
+                        .setDescription(description)
+                        .setFooter("Bot by DaPhatWan#5333", ""))
+                    .block();
+            }
+            else {
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Defense Multiplier")
+                        .setUrl("https://genshin-impact.fandom.com/wiki/Defense#Enemy_Defense")
+                        .setDescription(status)
+                        .setFooter("Bot by DaPhatWan#5333", "")
+                    ).block();
+            }
+        });
+
+        // p!parry command - calculates expected Beidou Tidecaller skill damage
         commands.put("parry", event -> {
             String input = event.getMessage().getContent().trim();
             String command = input.substring(0, 7);
             String parameters = input.substring(7);
 
-            DamageOperator checkInput = new DamageOperator(command, parameters);
+            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
             String status = checkInput.checkFormat();
 
             if (status.equals("Success")) {
@@ -166,12 +268,13 @@ public class DaPhatBot {
             }
         });
 
+        // p!ult command - calculates expected Beidou Stormcaller burst damage
         commands.put("ult", event -> {
             String input = event.getMessage().getContent().trim();
             String command = input.substring(0, 5);
             String parameters = input.substring(5);
 
-            DamageOperator checkInput = new DamageOperator(command, parameters);
+            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
             String status = checkInput.checkFormat();
             if (status.equals("Success")) {
                 Beidou parry = checkInput.getBeidou();

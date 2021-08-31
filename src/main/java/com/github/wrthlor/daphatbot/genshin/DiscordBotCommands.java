@@ -1,15 +1,14 @@
 package com.github.wrthlor.daphatbot.genshin;
 
-public class DamageOperator {
+public class DiscordBotCommands {
 
     private String command;
     private String parameters;
     private String[] numbers;
 
-    public DamageOperator(String cmd, String para) {
+    public DiscordBotCommands(String cmd, String para) {
         this.command = cmd;
         this.parameters = para;
-
         // Splits given parameters string by whitespaces
         this.numbers = this.parameters.trim().split("\\s+");
     }
@@ -20,6 +19,26 @@ public class DamageOperator {
 
     public String checkFormat() {
 
+        // Checks for negative number input
+        // Specifically for `p!calcRes` command
+        String negRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)";
+        if (this.command.equals("p!calcRes")) {
+            if (numbers.length != 1) {
+                return "Please use format: \n`" + this.command + " Enemy_RES`";
+            }
+
+            if (numbers[0].matches(negRegex)) {
+                return "Success";
+            }
+        }
+
+        // calcRes command
+        if (this.command.equals("p!calcRes")) {
+            if (numbers.length != 1) {
+                return "Please use format: \n`" + this.command + " Enemy_RES`";
+            }
+        }
+
         // Checks for acceptable input format
         // Acceptable number format: X, X., X.X, .X
         String regex = "\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+";
@@ -28,8 +47,14 @@ public class DamageOperator {
                 if (this.command.equals("p!damage")) {
                     return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG`";
                 }
-                else {
+                else if (this.command.equals("p!parry") || this.command.equals("p!ult")) {
                     return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG Talent_lvl`";
+                }
+                else if (this.command.equals("p!calcRes")) {
+                    return "Please use format: \n`" + this.command + " Enemy_RES`";
+                }
+                else if (this.command.equals("p!calcDef")) {
+                    return "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
                 }
             }
         }
@@ -38,6 +63,20 @@ public class DamageOperator {
         if (this.command.equals("p!damage")) {
             if (numbers.length != 4) {
                 return "Please use format: \n`" + this.command + " ATK DMG% CRIT_Rate CRIT_DMG`";
+            }
+        }
+
+//        // calcRes command
+//        if (this.command.equals("p!calcRes")) {
+//            if (numbers.length != 1) {
+//                return "Please use format: \n`" + this.command + " Enemy_RES`";
+//            }
+//        }
+
+        // calcDef command
+        if (this.command.equals("p!calcDef")) {
+            if (numbers.length < 2 || numbers.length > 3) {
+                return "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
             }
         }
 
