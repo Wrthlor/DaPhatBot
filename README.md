@@ -12,10 +12,15 @@ Done in Java, utilizing Discord4J
 ## To do list 
 * Interface with Guild Wars 2 API
   * [GW2 API wiki page](https://wiki.guildwars2.com/wiki/API:Main)
-* For Genshin DPS calculator, implement capability for users to give varying enemy RES values
+* For Genshin DPS calculator, implement capability for users to:
+  * Calculate enemy DEF / RES multiplier values
+  * Provide *optional* DEF / RES multiplier values for damage calculations 
 
 <!-- Acknowledgements -->
 ## Acknowledgements 
 * [Discord Bot API](https://discord.com/developers/docs/intro)
 * [Discord4J](https://github.com/Discord4J/Discord4J)
-* [Keqing Mains Damage Formula](https://library.keqingmains.com/mechanics/combat/damage-formula)
+<!-- Game specific -->
+* Genshin Impact
+  * [Keqing Mains Damage Formula](https://library.keqingmains.com/mechanics/combat/damage-formula)
+  * [Beidou Mains Discord](https://discord.gg/thecrux)
