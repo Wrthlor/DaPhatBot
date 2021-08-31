@@ -5,57 +5,79 @@ package com.github.wrthlor.daphatbot.genshin;
 public class GenshinDamageCalculator {
 
     protected double totalAttack, damagePercent, critRate, critDamage;
-    // Assumptions: character level = enemy level (DEF multiplier = 50%) and enemy base RES = 10%
-    protected double defenseMultiplier = 0.5;
-    protected double resistance = 0.1;
+    protected double resistanceMultiplier, defenseMultiplier;
 
+    // Assumptions: enemy base RES = 10% (RES_multiplier = 0.9) and character level = enemy level (DEF_multiplier = 0.5)
     public GenshinDamageCalculator() {
-        this.totalAttack = this.damagePercent = this.critRate = this.critDamage = 0.0;
+        this(0, 0, 0, 0, 0.9, 0.5);
     }
 
     public GenshinDamageCalculator(double attack, double dmgBonus, double cRate, double cDmg) {
+        this(attack, dmgBonus, cRate, cDmg, 0.9, 0.5);
+    }
+
+    // Only RES_multiplier is provided
+    public GenshinDamageCalculator(double attack, double dmgBonus, double cRate, double cDmg, double resMult) {
+        this(attack, dmgBonus, cRate, cDmg, resMult, 0.5);
+    }
+
+    // Both RES_multiplier and DEF_multiplier are provided
+    public GenshinDamageCalculator(double attack, double dmgBonus, double cRate, double cDmg, double resMult, double defMult) {
         this.totalAttack = attack;
         this.damagePercent = dmgBonus;
         this.critRate = cRate;
         this.critDamage = cDmg;
+        this.resistanceMultiplier = resMult;
+        this.defenseMultiplier = defMult;
     }
 
     // Shows given stats
     @Override
     public String toString() {
-        return "ATK: " + this.totalAttack +  "\nDMG%: " + this.damagePercent + "%"
-            + "\nCRIT_Rate: " + this.critRate + "%\nCRIT_DMG: " + this.critDamage + "%";
+        return "ATK: " + this.totalAttack +  "\nDMG%: " + this.damagePercent + "%\n" +
+            "CRIT_Rate: " + this.critRate + "%\nCRIT_DMG: " + this.critDamage + "%\n" +
+            "RES_Multiplier: " + this.resistanceMultiplier + "\nDEF_Multiplier: " + this.defenseMultiplier;
     }
 
-    // Can be used for future implementation if enemy RES values are a given argument
-    // Currently should be static and return 0.9
     // Calculates RES_multiplier
-    public double calculateRes() {
-        if (this.resistance < 0) {
-            return 1 - this.resistance / 2;
+    public double calculateResistanceMult(double resistance) {
+        resistance = resistance / 100;
+        if (resistance < 0) {
+            return 1 - resistance / 2;
         }
-        else if (this.resistance > 0.75) {
-            return 1 / (4 * this.resistance + 1);
+        else if (resistance > 0.75) {
+            return 1 / (4 * resistance + 1);
         }
         else {
-            return 1 - this.resistance;
+            return 1 - resistance;
         }
+    }
+
+    // Calculates DEF_multiplier
+    public double calculateDefenseMult(int characterLevel, int enemyLevel) {
+        return calculateDefenseMult(characterLevel, enemyLevel, 0.0);
+    }
+
+    // Defense reduction provided
+    // Defense shred is hard capped at 90%
+    public double calculateDefenseMult(int characterLevel, int enemyLevel, double defReduction) {
+        return (characterLevel + 100) / ((characterLevel + 100) + (enemyLevel + 100) * ( 1 - Math.min(defReduction, 90) / 100));
     }
 
     // Calculate base damage
-    // Outgoing_Damage = Total_Attack * (1 + Dmg%) *  DEF_multiplier * RES_multiplier
+    // Outgoing_Damage = Total_Attack * (1 + Dmg%) * RES_multiplier * DEF_multiplier
     public int calculateBase() {
-        return (int) (this.totalAttack * (1 + this.damagePercent / 100) * this.defenseMultiplier * this.calculateRes());
+        return (int) (this.totalAttack * (1 + this.damagePercent / 100) * this.resistanceMultiplier * this.defenseMultiplier);
     }
 
     // Calculate critical hits
-    // Outgoing_Damage_Crit = Total_Attack * (1 + Dmg%) * (1 + CritDmg%) *  DEF_multiplier * RES_multiplier
+    // Outgoing_Damage_Crit = Total_Attack * (1 + Dmg%) * (1 + CritDmg%) * RES_multiplier *  DEF_multiplier
     public int calculateCritical() {
         return (int) (this.calculateBase() * (1 + this.critDamage / 100));
     }
 
     // Calculate the average output damage (over infinite amount of time)
-    // Outgoing_Damage_Average = Total_Attack * (1 + Dmg%) * CRIT_multiplier *  DEF_multiplier * RES_multiplier
+    // Outgoing_Damage_Average = Total_Attack * (1 + Dmg%) * CRIT_multiplier * RES_multiplier *  DEF_multiplier
     // where CRIT_multiplier = (1 + (min(Crit_Rate, 100%) * Crit_Damage))
     public int calculateAverageDamage() {
         double outgoingDamage = this.calculateBase();
