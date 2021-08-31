@@ -41,7 +41,7 @@ public class GenshinDamageCalculator {
     }
 
     // Calculates RES_multiplier
-    public double calculateResistanceMultiplier(double resistance) {
+    public double resistanceMultiplier(double resistance) {
         resistance = resistance / 100;
         if (resistance < 0) {
             return 1 - resistance / 2;
@@ -55,13 +55,13 @@ public class GenshinDamageCalculator {
     }
 
     // Calculates DEF_multiplier
-    public double calculateDefenseMultiplier(double characterLevel, double enemyLevel) {
-        return calculateDefenseMultiplier(characterLevel, enemyLevel, 0.0);
+    public double defenseMultiplier(double characterLevel, double enemyLevel) {
+        return defenseMultiplier(characterLevel, enemyLevel, 0.0);
     }
 
     // Defense reduction provided
     // Defense shred is hard capped at 90%
-    public double calculateDefenseMultiplier(double characterLevel, double enemyLevel, double defReduction) {
+    public double defenseMultiplier(double characterLevel, double enemyLevel, double defReduction) {
         return (characterLevel + 100) / ((characterLevel + 100) + (enemyLevel + 100) * ( 1 - Math.min(defReduction, 90) / 100));
     }
 

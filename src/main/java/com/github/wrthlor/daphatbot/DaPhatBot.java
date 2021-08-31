@@ -63,24 +63,32 @@ public class DaPhatBot {
     static {
         // p!help command - Displays all available commands
         commands.put("help", event -> {
-            String dpsMessages = "`p!damage` - Gets expected output damage, ignoring talents \n" +
-                "⤷ Format: `p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n"+
-                "`p!calcRes` - Gets enemy resistance *multiplier* \n" +
-                "⤷ Format: `p!calcRes Enemy_RES` \n"+
-                "`p!calcDef` - Gets enemy defense *multiplier* \n" +
-                "⤷ Format: `p!calcDef Char_lvl Enemy_lvl [DEF_Reduction]` ";
-            String beidouMessages = "`p!parry` - Gets expected Tidecaller damage \n" +
-                "⤷ Format: `p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
-                "`p!ult` - Gets expected Stormbreaker damage \n" +
-                "⤷ Format: `p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` ";
+            String dpsMessages = "`p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
+                "⤷ Gets expected output damage, ignoring talents \n"+
+//                "`p!extraAtk baseATK 4NO Pyro TToDS` \n" +
+//                "⤷ Gets common *external* ATK% buffs (4NO, Pyro Resonance, TToDS) \n" +
+//                "⤷ `y/n` to include/exclude calculation \n" +
+//                "⤷ TToDS: `1-5` = refinement levels, `y = R5` `n = no TToDS` \n" +
+                "`p!calcRes Enemy_RES` \n" +
+                "⤷ Gets enemy resistance *multiplier* \n"+
+                "`p!calcDef Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
+                "⤷ Gets enemy defense *multiplier* ";
+            String beidouMessages = "`p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
+                "⤷ Gets expected Tidecaller damage \n" +
+                "`p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
+                "⤷ Gets expected Stormbreaker damage ";
+            String notes = "Bracketed inputs are optional \n" +
+                "⤷ Example: `p!calcDef 80 95` and `p!calcDef 80 95 10` are both valid ";
 
             event.getMessage()
                 .getChannel().block()
                 // 0xe6e6fa = Lavender
                 .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                     .setTitle("DPS calculator commands")
+                    .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
                     .addField("General DPS command", dpsMessages, false)
                     .addField("Beidou specific commands", beidouMessages, false)
+                    .addField("Notes", notes, false)
                     .setFooter("Bot by DaPhatWan#5333", "")
                     .setTimestamp(Instant.now())
                 ).block();
@@ -96,7 +104,46 @@ public class DaPhatBot {
             String status = checkInput.checkFormat();
             if (status.equals("Success")) {
 
-                GenshinDamageCalculator results = checkInput.getDamage();
+                ArrayList<Double> paramValues = new ArrayList<>();
+                for (String nums : checkInput.getNumbers()) {
+                    paramValues.add(Double.parseDouble(nums));
+                }
+
+                String description = "";
+                String notes = "Notes: \n" +
+                    "• Talents are **NOT** factored. Please check wiki/in-game to get `Talent%` multiplier \n" +
+                    "• Click link for more details \n";
+
+                GenshinDamageCalculator results;
+                // User provides RES_multiplier and DEF_multiplier
+                if (paramValues.size() == 6) {
+                    results = new GenshinDamageCalculator(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4), paramValues.get(5));
+
+                    description = "Assumptions: \n" +
+                        "• `DEF_Mult = " + paramValues.get(5) + "` \n" +
+                        "• `RES_Mult = " + paramValues.get(4) + "` \n";
+                }
+                // User provides only RES_multiplier
+                else if (paramValues.size() == 5) {
+                    results = new GenshinDamageCalculator(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• `RES_Mult = " + paramValues.get(4) + "` \n";
+                }
+                // User provides no additional multipliers
+                else {
+                    results = new GenshinDamageCalculator(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• Enemy has `RES = 10%` → `RES_Mult = 0.9` \n";
+                }
+                String finalDescription = description + notes;
+
                 String base = String.valueOf(results.calculateBase());
                 String crit = String.valueOf(results.calculateCritical());
                 String avg = String.valueOf(results.calculateAverageDamage());
@@ -105,12 +152,8 @@ public class DaPhatBot {
                     .getChannel().block()
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
-                        .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
-                        .setDescription("Assumptions: \n" +
-                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
-                            "• Enemy has `RES = 10%` \n" +
-                            "• Talents are **NOT** factored. Please check wiki/in-game to get Talent% multiplier \n" +
-                            "• Click link for more details")
+                        .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula#general-formula-for-damage")
+                        .setDescription(finalDescription)
                         .addField("*Base damage* ", base, true)
                         .addField("*Critical hit damage* ", crit, true)
                         .addField("*Average damage output* ", avg, true)
@@ -122,7 +165,7 @@ public class DaPhatBot {
                     .getChannel().block()
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
-                        .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
+                        .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula#general-formula-for-damage")
                         .setDescription(status)
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
@@ -143,7 +186,7 @@ public class DaPhatBot {
                 GenshinDamageCalculator resistance = new GenshinDamageCalculator();
 
                 String paramValue = checkInput.getNumbers()[0];
-                double output = resistance.calculateResistanceMultiplier(Double.parseDouble(paramValue));
+                Double output = resistance.resistanceMultiplier(Double.parseDouble(paramValue));
 
                 event.getMessage()
                     .getChannel().block()
@@ -189,11 +232,11 @@ public class DaPhatBot {
                 double output;
                 String extra = "";
                 if (paramValues.size() == 3) {
-                    output = defense.calculateDefenseMultiplier(paramValues.get(0), paramValues.get(1), paramValues.get(2));
+                    output = defense.defenseMultiplier(paramValues.get(0), paramValues.get(1), paramValues.get(2));
                     extra = "\nDefense reduction: " + paramValues.get(2) + "%";
                 }
                 else {
-                    output = defense.calculateDefenseMultiplier(paramValues.get(0), paramValues.get(1));
+                    output = defense.defenseMultiplier(paramValues.get(0), paramValues.get(1));
                     extra = "";
                 }
 
@@ -233,7 +276,48 @@ public class DaPhatBot {
 
             if (status.equals("Success")) {
 
-                Beidou parry = checkInput.getBeidou();
+                ArrayList<Double> paramValues = new ArrayList<>();
+                for (String nums : checkInput.getNumbers()) {
+                    paramValues.add(Double.parseDouble(nums));
+                }
+
+                String description = "";
+                String notes = "How **Tidecaller** works: \n" +
+                    "• Zero hits = *Tap*\n" +
+                    "• Two (or more) hits = *Full* = *\"Perfect\"* (A1 Talent)\n";
+
+                Beidou parry;
+                // User provides RES_multiplier and DEF_multiplier
+                if (paramValues.size() == 7) {
+                    parry = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4),
+                        paramValues.get(5), paramValues.get(6));
+
+                    description = "Assumptions: \n" +
+                        "• `DEF_Mult = " + paramValues.get(6) + "` \n" +
+                        "• `RES_Mult = " + paramValues.get(5) + "` \n";
+                }
+                // User provides only RES_multiplier
+                else if (paramValues.size() == 6) {
+                    parry = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4),
+                        paramValues.get(5));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• `RES_Mult = " + paramValues.get(5) + "` \n";
+                }
+                // User provides no additional multipliers
+                else {
+                    parry = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• Enemy has `RES = 10%` → `RES_Mult = 0.9` \n";
+                }
+                String finalDescription = description + notes;
+
                 int[] tap = parry.calculateParry(0);
                 int[] perfect = parry.calculateParry(2);
 
@@ -242,12 +326,7 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.VIVID_VIOLET)
                         .setTitle("Tidecaller Damage")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Tidecaller")
-                        .setDescription("Assumptions: \n" +
-                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
-                            "• Enemy has `RES = 10%` \n" +
-                            "How **Tidecaller** works: \n" +
-                            "• Zero hits = *Tap*\n" +
-                            "• Two (or more) hits = *Full* = *\"Perfect\"* (A1 Talent)")
+                        .setDescription(finalDescription)
                         .addField("\u200B", "*Base damage:*\n" +
                             "*Critical hit damage:*\n" +
                             "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler
@@ -277,20 +356,58 @@ public class DaPhatBot {
             DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
             String status = checkInput.checkFormat();
             if (status.equals("Success")) {
-                Beidou parry = checkInput.getBeidou();
-                int[] ult = parry.calculateUlt();
+
+                ArrayList<Double> paramValues = new ArrayList<>();
+                for (String nums : checkInput.getNumbers()) {
+                    paramValues.add(Double.parseDouble(nums));
+                }
+
+                String description = "";
+                String notes = "How **Stormbreaker** works: \n" +
+                    "• Damage calculated *per* discharge \n" +
+                    "• Multiply by number of jumps and discharges for total damage";
+
+                Beidou burst;
+                // User provides RES_multiplier and DEF_multiplier
+                if (paramValues.size() == 7) {
+                    burst = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4),
+                        paramValues.get(5), paramValues.get(6));
+
+                    description = "Assumptions: \n" +
+                        "• `DEF_Mult = " + paramValues.get(6) + "` \n" +
+                        "• `RES_Mult = " + paramValues.get(5) + "` \n";
+                }
+                // User provides only RES_multiplier
+                else if (paramValues.size() == 6) {
+                    burst = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4),
+                        paramValues.get(5));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• `RES_Mult = " + paramValues.get(5) + "` \n";
+                }
+                // User provides no additional multipliers
+                else {
+                    burst = new Beidou(paramValues.get(0), paramValues.get(1),
+                        paramValues.get(2), paramValues.get(3), paramValues.get(4));
+
+                    description = "Assumptions: \n" +
+                        "• Character level = Enemy level → `DEF_Mult = 0.5` \n" +
+                        "• Enemy has `RES = 10%` → `RES_Mult = 0.9` \n";
+                }
+                String finalDescription = description + notes;
+
+//                Beidou parry = checkInput.getBeidou();
+                int[] ult = burst.calculateUlt();
 
                 event.getMessage()
                     .getChannel().block()
                     .createEmbed(spec -> spec.setColor(Color.VIVID_VIOLET)
                         .setTitle("Stormbreaker Damage")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Stormbreaker")
-                        .setDescription("Assumptions: \n" +
-                            "• Character level = Enemy level → `DEF_multiplier = 50%` \n" +
-                            "• Enemy has `RES = 10%` \n" +
-                            "How **Stormbreaker** works: \n" +
-                            "• Damage calculated *per* discharge \n" +
-                            "• Multiply by number of jumps and discharges for total damage")
+                        .setDescription(finalDescription)
                         .addField("\u200B", "*Base damage:*\n" +
                             "*Critical hit damage:*\n" +
                             "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler

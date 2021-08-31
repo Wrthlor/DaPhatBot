@@ -13,15 +13,27 @@ public class Beidou extends GenshinDamageCalculator {
     final private double[] lightning = {96, 103, 110, 120, 127, 134, 144, 154, 163, 173, 182, 192, 203};
 
     public Beidou() {
-        this(0, 0, 0, 0, 1);
+        this(0, 0, 0, 0, 1, 0.9, 0.5);
     }
 
-    public Beidou(double attack, double dmgBonus, double cRate, double cDmg, int level) {
+    public Beidou(double attack, double dmgBonus, double cRate, double cDmg, double level) {
+        this(attack, dmgBonus, cRate, cDmg, level, 0.9, 0.5);
+    }
+
+    // Only RES_multiplier is provided
+    public Beidou(double attack, double dmgBonus, double cRate, double cDmg, double level, double resMult) {
+        this(attack, dmgBonus, cRate, cDmg, level, resMult, 0.5);
+    }
+
+    // Both RES_multiplier and DEF_multiplier are provided
+    public Beidou(double attack, double dmgBonus, double cRate, double cDmg, double level, double resMult, double defMult) {
         this.totalAttack = attack;
         this.damagePercent = dmgBonus;
         this.critRate = cRate;
         this.critDamage = cDmg;
-        this.talent = level;
+        this.talent = (int) level;
+        this.resistanceMultiplier = resMult;
+        this.defenseMultiplier = defMult;
     }
 
     // Shows given stats
