@@ -1,85 +1,138 @@
 package com.github.wrthlor.daphatbot.genshin;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class DiscordBotCommands {
 
     private String command;
     private String parameters;
-    private String[] numbers;
+    private String[] inputs;
+    private boolean acceptableFormat;
+    private String message;
 
     public DiscordBotCommands(String cmd, String para) {
         this.command = cmd;
         this.parameters = para;
+
         // Splits given parameters string by whitespaces
-        this.numbers = this.parameters.trim().split("\\s+");
+        this.inputs = this.parameters.trim().split("\\s+");
+
+        this.acceptableFormat = false;
+        this.message = "";
     }
 
-    public String[] getNumbers() {
-        return this.numbers;
+    public String[] getInputs() {
+        return this.inputs;
     }
 
-    public String checkFormat() {
+    public boolean getAcceptableFormat() {
+        return this.acceptableFormat;
+    }
 
-        // Checks for acceptable input format
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void checkFormat() {
+
+        // Checks for acceptable inputs
         // Acceptable number format: X, X., X.X, .X
         String regex = "\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+";
-        for (String nums : numbers) {
+        Pattern pattern = Pattern.compile(regex);
+
+        String negRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)";
+        for (String nums : inputs) {
 
             // Checks for negative number input
             // Specifically for `p!calcRes` command
             if (this.command.equals("p!calcRes")) {
-                if (!nums.matches("\\-?"+regex)) {
-                    return "Please use format: \n`" + this.command + " Enemy_RES`";
+                if (!nums.matches(negRegex)) {
+                    this.message = "Please use format: \n`" + this.command + " Enemy_RES`";
+                    this.acceptableFormat = false;
+                    return;
+                }
+                break;
+            }
+
+            // For all other commands (don't take negative inputs)
+            Matcher matcher = pattern.matcher(nums);
+            if (!matcher.matches()) {
+                switch(this.command) {
+                    // p!damage
+                    case "p!damage": {
+                        this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]`";
+                        this.acceptableFormat = false;
+                        return;
+                    }
+
+                    // p!calcDef
+                    case "p!calcDef": {
+                        this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
+                        this.acceptableFormat = false;
+                        return;
+                    }
+
+                    // p!parry or p!ult
+                    default: {
+                        this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]`";
+                        this.acceptableFormat = false;
+                        return;
+                    }
                 }
             }
-            else {
-                if (!nums.matches(regex)) {
-                    if (this.command.equals("p!damage")) {
-                        return "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]`";
-                    }
-                    else if (this.command.equals("p!parry") || this.command.equals("p!ult")) {
-                        return "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]`";
-                    }
-                    else if (this.command.equals("p!calcDef")) {
-                        return "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
-                    }
+        }
+
+        switch (this.command) {
+            // p!damage
+            case "p!damage": {
+                if (inputs.length < 4 || inputs.length > 6) {
+                    this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]`";
+                    this.acceptableFormat = false;
+                    return;
                 }
+                break;
+            }
+
+            // p!calcRes
+            case "p!calcRes": {
+                if (inputs.length != 1) {
+                    this.message = "Please use format: \n`" + this.command + " Enemy_RES`";
+                    this.acceptableFormat = false;
+                    return;
+                }
+                break;
+            }
+
+            // p!calcDef
+            case "p!calcDef": {
+                if (inputs.length < 2 || inputs.length > 3) {
+                    this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
+                    this.acceptableFormat = false;
+                    return;
+                }
+                break;
+            }
+
+            // p!parry or p!ult
+            default: {
+                if (inputs.length < 5 || inputs.length > 7) {
+                    this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]`";
+                    this.acceptableFormat = false;
+                    return;
+                }
+
+                // Checks talent level input is within reachable values: 1-13 inclusive
+                int value = (int) Double.parseDouble(this.inputs[4]);
+                if (value < 1 || value > 13) {
+                    this.message = "`Talent_lvl` must be between 1 and 13, inclusive";
+                    this.acceptableFormat = false;
+                    return;
+                }
+                break;
             }
         }
 
-        // Damage command
-        if (this.command.equals("p!damage")) {
-            if (numbers.length < 4 || numbers.length > 6) {
-                return "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]`";
-            }
-        }
-
-        // calcRes command
-        if (this.command.equals("p!calcRes")) {
-            if (numbers.length != 1) {
-                return "Please use format: \n`" + this.command + " Enemy_RES`";
-            }
-        }
-
-        // calcDef command
-        if (this.command.equals("p!calcDef")) {
-            if (numbers.length < 2 || numbers.length > 3) {
-                return "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]`";
-            }
-        }
-
-        // Beidou commands
-        if (this.command.equals("p!parry") || this.command.equals("p!ult")) {
-            if (numbers.length < 5 || numbers.length > 7) {
-                return "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]`";
-            }
-
-            // Checks talent level input is within reachable values: 1-13 inclusive
-            int value = (int) Double.parseDouble(this.numbers[4]);
-            if (value < 1 || value > 13) {
-                return "`Talent_lvl` must be between 1 and 13, inclusive";
-            }
-        }
-
-        return "Success";
+        this.acceptableFormat = true;
     }
 }
