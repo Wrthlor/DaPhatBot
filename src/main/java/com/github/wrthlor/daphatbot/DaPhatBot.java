@@ -78,7 +78,7 @@ public class DaPhatBot {
                 "✅ `p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
                 "└ Gets expected Stormbreaker damage ";
             String notes = "Bracketed inputs are optional \n" +
-                "└ Example: `p!calcDef 80 95` and `p!calcDef 80 95 10` are both valid ";
+                "└ Example: `p!calcDEF 80 95` and `p!calcDEF 80 95 10` are both valid ";
 
             event.getMessage()
                 .getChannel().block()
