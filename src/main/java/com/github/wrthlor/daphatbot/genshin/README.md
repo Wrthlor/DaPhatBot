@@ -8,6 +8,8 @@
   * Gets expected output damage, ignoring talents
 * `p!extraATK baseATK 4NO pyro TToDS`
   * Gets common, *external* ATK% buffs (4NO, pyro resonance, TToDS)
+  * Click [here](https://github.com/Wrthlor/DaPhatBot/blob/master/src/main/java/com/github/wrthlor/daphatbot/genshin/Images/CalculatingAdditionalAttack.png)
+  to learn how to calculate additional ATK% buffs
 * `p!calcRES Enemy_RES`
   * Gets enemy resistance multiplier
 * `p!calcDEF Char_lvl Enemy_lvl [DEF_Reduction]`

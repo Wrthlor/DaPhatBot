@@ -18,8 +18,6 @@ Done in Java, utilizing Discord4J
 ### To do list 
 * Interface with Guild Wars 2 API
   * [GW2 API wiki page](https://wiki.guildwars2.com/wiki/API:Main)
-* For Genshin DPS calculator, implement capability for users to:
-  * Calculate common external ATK buffs (4NO, Pyro Resonance, TToDS)
 
 <!-- Acknowledgements -->
 ## Acknowledgements 
