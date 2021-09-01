@@ -47,7 +47,7 @@ public class GenshinCommands {
             if (this.command.equals("p!extraATK")) {
                 String extraAttackRegex = "(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)\\s+[yYnN]\\s+[yYnN]\\s+([yYnN]|\\d+)";
                 if (!this.parameters.matches(extraAttackRegex)) {
-                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO Pyro TToDS`\n" +
+                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS`\n" +
                         "⤷ Use **left, white ATK** stat on characters stats for baseATK \n" +
                         "⤷ Include/exclude calculation with y/n \n" +
                         "⤷ TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS";
@@ -115,7 +115,7 @@ public class GenshinCommands {
             // p!extraATK
             case "p!extraATK": {
                 if (inputs.length != 4) {
-                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO Pyro TToDS`";
+                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS`";
                     this.acceptableFormat = false;
                     return;
                 }

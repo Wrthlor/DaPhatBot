@@ -62,33 +62,33 @@ public class DaPhatBot {
     static {
         // p!help command - Displays all available commands
         commands.put("help", event -> {
-            String dpsMessages = "`p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
-                "⤷ Gets expected output damage, ignoring talents \n"+
-                "`p!extraATK baseATK 4NO Pyro TToDS` \n" +
-                "⤷ Gets common, *external* ATK% buffs (4NO, Pyro Resonance, TToDS) \n" +
-                "⤷ Use **left, white ATK** stat on characters stats for `baseATK` \n" +
-                "⤷ Include/exclude calculation with `y/n` \n" +
-                "⤷ TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS \n" +
-                "`p!calcRES Enemy_RES` \n" +
-                "⤷ Gets enemy resistance *multiplier* \n"+
-                "`p!calcDEF Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
-                "⤷ Gets enemy defense *multiplier* ";
-            String beidouMessages = "`p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
-                "⤷ Gets expected Tidecaller damage \n" +
-                "`p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
-                "⤷ Gets expected Stormbreaker damage ";
+            String dpsMessages = "✅ `p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
+                "└ Gets expected output damage, ignoring talents \n"+
+                "✅ `p!extraATK baseATK 4NO pyro TToDS` \n" +
+                "└ Gets common, *external* ATK% buffs (4NO, pyro resonance, TToDS) \n" +
+                "└ Use **left, white ATK** stat on Attributes menu for baseATK \n" +
+                "└ Include/exclude calculation with y/n \n" +
+                "└ TToDS: 1-5 for refinements (integers only), y = R5, n excludes TToDS \n" +
+                "✅ `p!calcRES Enemy_RES` \n" +
+                "└ Gets enemy resistance *multiplier* → RES_Mult \n"+
+                "✅ `p!calcDEF Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
+                "└ Gets enemy defense *multiplier* → DEF_Mult";
+            String beidouMessages = "✅ `p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
+                "└ Gets expected Tidecaller damage \n" +
+                "✅ `p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
+                "└ Gets expected Stormbreaker damage ";
             String notes = "Bracketed inputs are optional \n" +
-                "⤷ Example: `p!calcDef 80 95` and `p!calcDef 80 95 10` are both valid ";
+                "└ Example: `p!calcDef 80 95` and `p!calcDef 80 95 10` are both valid ";
 
             event.getMessage()
                 .getChannel().block()
                 // 0xe6e6fa = Lavender
                 .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
-                    .setTitle("DPS calculator commands")
+                    .setTitle("Genshin Calculator Commands")
                     .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula")
-                    .addField("General DPS command", dpsMessages, false)
-                    .addField("Beidou specific commands", beidouMessages, false)
-                    .addField("Notes", notes, false)
+                    .addField("*=== General DPS commands ===*", dpsMessages, false)
+                    .addField("*=== Beidou specific commands ===*", beidouMessages, false)
+                    .addField("*=== Notes ===*", notes, false)
                     .setFooter("Bot by DaPhatWan#5333", "")
                 ).block();
         });
@@ -215,7 +215,7 @@ public class DaPhatBot {
                         .setTitle("Common External ATK% Buffs")
                         .setUrl("https://github.com/Wrthlor/DaPhatBot/blob/master/src/main/java/com/github/wrthlor/daphatbot/genshin/Images/CalculatingAdditionalAttack.png")
                         .setDescription("Base attack: " + baseAttack + " \n" + "4 Noblesse: " + paramValues[1] + " \n" +
-                            "Pyro resonance: " + paramValues[2] + " \n" + "TToDS: " + ttods + " \n\n" +
+                            "pyro resonance: " + paramValues[2] + " \n" + "TToDS: " + ttods + " \n\n" +
                             "Note: \n" +
                             "• Click link to find out how to calculate additional ATK% buffs \n\n" +
                             "***Extra ATK%:*** " + output)
