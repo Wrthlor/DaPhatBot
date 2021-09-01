@@ -11,7 +11,6 @@ import discord4j.core.object.entity.User;
 import discord4j.rest.util.Color;
 
 // Java packages
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,13 +64,14 @@ public class DaPhatBot {
         commands.put("help", event -> {
             String dpsMessages = "`p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
                 "⤷ Gets expected output damage, ignoring talents \n"+
-//                "`p!extraAtk baseATK 4NO Pyro TToDS` \n" +
-//                "⤷ Gets common *external* ATK% buffs (4NO, Pyro Resonance, TToDS) \n" +
-//                "⤷ `y/n` to include/exclude calculation \n" +
-//                "⤷ TToDS: `1-5` = refinement levels, `y = R5` `n = no TToDS` \n" +
-                "`p!calcRes Enemy_RES` \n" +
+                "`p!extraATK baseATK 4NO Pyro TToDS` \n" +
+                "⤷ Gets common, *external* ATK% buffs (4NO, Pyro Resonance, TToDS) \n" +
+                "⤷ Use **left, white ATK** stat on characters stats for `baseATK` \n" +
+                "⤷ Include/exclude calculation with `y/n` \n" +
+                "⤷ TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS \n" +
+                "`p!calcRES Enemy_RES` \n" +
                 "⤷ Gets enemy resistance *multiplier* \n"+
-                "`p!calcDef Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
+                "`p!calcDEF Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
                 "⤷ Gets enemy defense *multiplier* ";
             String beidouMessages = "`p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
                 "⤷ Gets expected Tidecaller damage \n" +
@@ -90,7 +90,6 @@ public class DaPhatBot {
                     .addField("Beidou specific commands", beidouMessages, false)
                     .addField("Notes", notes, false)
                     .setFooter("Bot by DaPhatWan#5333", "")
-                    .setTimestamp(Instant.now())
                 ).block();
         });
 
@@ -100,12 +99,12 @@ public class DaPhatBot {
             String command = input.substring(0, 8);
             String parameters = input.substring(8);
 
-            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
-            checkInput.checkFormat();
-            if (checkInput.getAcceptableFormat()) {
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
+            if (variables.getAcceptableFormat()) {
 
                 ArrayList<Double> paramValues = new ArrayList<>();
-                for (String nums : checkInput.getInputs()) {
+                for (String nums : variables.getInputs()) {
                     paramValues.add(Double.parseDouble(nums));
                 }
 
@@ -166,26 +165,90 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Damage Calculator")
                         .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula#general-formula-for-damage")
-                        .setDescription(checkInput.getMessage())
+                        .setDescription(variables.getMessage())
+                        .setFooter("Bot by DaPhatWan#5333", "")
+                    ).block();
+            }
+        });
+
+        // p!extraAtk command - calculates common external ATK% buffs (4NO, Pyro Resonance, TToDS)
+        commands.put("extraATK", event -> {
+            String input = event.getMessage().getContent().trim();
+            String command = input.substring(0, 10);
+            String parameters = input.substring(10);
+
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
+
+            if (variables.getAcceptableFormat()) {
+                ExternalCalculations attack = new ExternalCalculations();
+
+                // Guaranteed 4 inputs
+                String[] paramValues = variables.getInputs();
+                double baseAttack = Double.parseDouble(paramValues[0]);
+                int noblesse = (paramValues[1].equals("y") || paramValues[1].equals("Y")) ? 1 : 0;
+                int pyro = (paramValues[2].equals("y") || paramValues[2].equals("Y")) ? 1 : 0;
+                int refines;
+                boolean letter;
+                if (paramValues[3].equalsIgnoreCase("n")) {
+                    refines = 0;
+                    letter = true;
+                }
+                else if (paramValues[3].equalsIgnoreCase("y")) {
+                    refines = 5;
+                    letter = true;
+                }
+                else {
+                    refines = Integer.parseInt(paramValues[3]);
+                    letter = false;
+                }
+
+                int output = (int) attack.commonExtraAttack(baseAttack, noblesse, pyro, refines);
+                // If not letter, output refinements
+                // If is letter and y, output R5, else output n
+                String ttods = !letter ? "R" + paramValues[3] :
+                    paramValues[3].equalsIgnoreCase("y") ? "R5" : "n";
+
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Common External ATK% Buffs")
+                        .setUrl("https://github.com/Wrthlor/DaPhatBot/blob/master/src/main/java/com/github/wrthlor/daphatbot/genshin/Images/CalculatingAdditionalAttack.png")
+                        .setDescription("Base attack: " + baseAttack + " \n" + "4 Noblesse: " + paramValues[1] + " \n" +
+                            "Pyro resonance: " + paramValues[2] + " \n" + "TToDS: " + ttods + " \n\n" +
+                            "Note: \n" +
+                            "• Click link to find out how to calculate additional ATK% buffs \n\n" +
+                            "***Extra ATK%:*** " + output)
+                        .setFooter("Bot by DaPhatWan#5333", "")
+                    ).block();
+
+            }
+            else {
+                event.getMessage()
+                    .getChannel().block()
+                    .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
+                        .setTitle("Common External ATK% Buffs")
+                        .setUrl("https://github.com/Wrthlor/DaPhatBot/blob/master/src/main/java/com/github/wrthlor/daphatbot/genshin/Images/CalculatingAdditionalAttack.png")
+                        .setDescription(variables.getMessage())
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
 
         // p!calcRes command - calculates RES multiplier for damage equation
-        commands.put("calcRes", event -> {
+        commands.put("calcRES", event -> {
             String input = event.getMessage().getContent().trim();
             String command = input.substring(0, 9);
             String parameters = input.substring(9);
 
             // p!calcRes Enemy_RES
-            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
-            checkInput.checkFormat();
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
 
-            if (checkInput.getAcceptableFormat()) {
+            if (variables.getAcceptableFormat()) {
                 ExternalCalculations resistance = new ExternalCalculations();
 
-                String paramValue = checkInput.getInputs()[0];
+                String paramValue = variables.getInputs()[0];
                 Double output = resistance.resistanceMultiplier(Double.parseDouble(paramValue));
 
                 event.getMessage()
@@ -194,7 +257,7 @@ public class DaPhatBot {
                         .setTitle("Resistance Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
                         .setDescription("Enemy resistance: " + paramValue + "%\n" +
-                            "\n**RES multiplier:** " + String.format("%.4f", output))
+                            "\n***RES multiplier:*** " + String.format("%.4f", output))
                         .setFooter("Bot by DaPhatWan#5333", ""))
                     .block();
             }
@@ -204,27 +267,27 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Resistance Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
-                        .setDescription(checkInput.getMessage())
+                        .setDescription(variables.getMessage())
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
 
         // p!calcDef command - calculates DEF multiplier for damage equation
-        commands.put("calcDef", event -> {
+        commands.put("calcDEF", event -> {
             String input = event.getMessage().getContent().trim();
             String command = input.substring(0, 9);
             String parameters = input.substring(9);
 
             // p!calcDef charLvl defLvl [defShred]
-            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
-            checkInput.checkFormat();
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
 
-            if (checkInput.getAcceptableFormat()) {
+            if (variables.getAcceptableFormat()) {
                 ExternalCalculations defense = new ExternalCalculations();
 
                 ArrayList<Double> paramValues = new ArrayList<>();
-                for (String nums : checkInput.getInputs()) {
+                for (String nums : variables.getInputs()) {
                     paramValues.add(Double.valueOf(nums));
                 }
 
@@ -241,7 +304,7 @@ public class DaPhatBot {
 
                 String description = "Character level: " + paramValues.get(0) +
                     "\nEnemy level: " + paramValues.get(1) + extra +
-                    "\n\n**DEF multiplier:** " + String.format("%.4f", output);
+                    "\n\n***DEF multiplier:*** " + String.format("%.4f", output);
 
                 event.getMessage()
                     .getChannel().block()
@@ -258,7 +321,7 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Defense Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Defense#Enemy_Defense")
-                        .setDescription(checkInput.getMessage())
+                        .setDescription(variables.getMessage())
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
@@ -270,13 +333,13 @@ public class DaPhatBot {
             String command = input.substring(0, 7);
             String parameters = input.substring(7);
 
-            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
-            checkInput.checkFormat();
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
 
-            if (checkInput.getAcceptableFormat()) {
+            if (variables.getAcceptableFormat()) {
 
                 ArrayList<Double> paramValues = new ArrayList<>();
-                for (String nums : checkInput.getInputs()) {
+                for (String nums : variables.getInputs()) {
                     paramValues.add(Double.parseDouble(nums));
                 }
 
@@ -340,7 +403,7 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Tidecaller Damage")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Tidecaller")
-                        .setDescription(checkInput.getMessage())
+                        .setDescription(variables.getMessage())
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
@@ -352,12 +415,12 @@ public class DaPhatBot {
             String command = input.substring(0, 5);
             String parameters = input.substring(5);
 
-            DiscordBotCommands checkInput = new DiscordBotCommands(command, parameters);
-            checkInput.checkFormat();
-            if (checkInput.getAcceptableFormat()) {
+            GenshinCommands variables = new GenshinCommands(command, parameters);
+            variables.checkFormat();
+            if (variables.getAcceptableFormat()) {
 
                 ArrayList<Double> paramValues = new ArrayList<>();
-                for (String nums : checkInput.getInputs()) {
+                for (String nums : variables.getInputs()) {
                     paramValues.add(Double.parseDouble(nums));
                 }
 
@@ -418,7 +481,7 @@ public class DaPhatBot {
                     .getChannel().block()
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Stormbreaker Damage")
-                        .setDescription(checkInput.getMessage())
+                        .setDescription(variables.getMessage())
                         .setFooter("Bot by DaPhatWan#5333", "")
                     ).block();
             }
