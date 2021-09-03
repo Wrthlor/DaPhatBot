@@ -156,7 +156,7 @@ public class DaPhatBot {
                         .addField("*Base damage* ", base, true)
                         .addField("*Critical hit damage* ", crit, true)
                         .addField("*Average damage output* ", avg, true)
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
             else {
@@ -166,7 +166,7 @@ public class DaPhatBot {
                         .setTitle("Damage Calculator")
                         .setUrl("https://library.keqingmains.com/mechanics/combat/damage-formula#general-formula-for-damage")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
@@ -219,7 +219,7 @@ public class DaPhatBot {
                             "Note: \n" +
                             "• Click link to find out how to calculate additional ATK% buffs \n\n" +
                             "***Extra ATK%:*** " + output)
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
 
             }
@@ -230,7 +230,7 @@ public class DaPhatBot {
                         .setTitle("Common External ATK% Buffs")
                         .setUrl("https://github.com/Wrthlor/DaPhatBot/blob/master/src/main/java/com/github/wrthlor/daphatbot/genshin/Images/CalculatingAdditionalAttack.png")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
@@ -258,7 +258,7 @@ public class DaPhatBot {
                         .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
                         .setDescription("Enemy resistance: " + paramValue + "%\n" +
                             "\n***RES multiplier:*** " + String.format("%.4f", output))
-                        .setFooter("Bot by DaPhatWan#5333", ""))
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", ""))
                     .block();
             }
             else {
@@ -268,7 +268,7 @@ public class DaPhatBot {
                         .setTitle("Resistance Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Resistance#RES_Percentage")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
@@ -312,7 +312,7 @@ public class DaPhatBot {
                         .setTitle("Defense Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Defense#Enemy_Defense")
                         .setDescription(description)
-                        .setFooter("Bot by DaPhatWan#5333", ""))
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", ""))
                     .block();
             }
             else {
@@ -322,7 +322,7 @@ public class DaPhatBot {
                         .setTitle("Defense Multiplier")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Defense#Enemy_Defense")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
@@ -394,7 +394,7 @@ public class DaPhatBot {
                             "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler
                         .addField("*Tap*", tap[0] + "\n" + tap[1] + "\n" + tap[2], true)
                         .addField("*Full / Perfect*", perfect[0] + "\n" + perfect[1] + "\n" + perfect[2], true)
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
             else {
@@ -404,7 +404,7 @@ public class DaPhatBot {
                         .setTitle("Tidecaller Damage")
                         .setUrl("https://genshin-impact.fandom.com/wiki/Tidecaller")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
@@ -473,7 +473,7 @@ public class DaPhatBot {
                             "*Critical hit damage:*\n" +
                             "*Average damage:*", true)   // Using Unicode "zero width space" as empty "String name" filler
                         .addField("*Lightning Damage*", ult[0] + "\n" + ult[1] + "\n" + ult[2], true)
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
             else {
@@ -482,7 +482,7 @@ public class DaPhatBot {
                     .createEmbed(spec -> spec.setColor(Color.of(0xE6E6FA))
                         .setTitle("Stormbreaker Damage")
                         .setDescription(variables.getMessage())
-                        .setFooter("Bot by DaPhatWan#5333", "")
+                        .setFooter("\"p!help\" for more commands, bot by DaPhatWan#5333", "")
                     ).block();
             }
         });
