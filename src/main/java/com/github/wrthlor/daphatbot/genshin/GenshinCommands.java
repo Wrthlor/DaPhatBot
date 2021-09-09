@@ -45,7 +45,7 @@ public class GenshinCommands {
             // Checks for specific possible string input
             // Specifically for `p!extraATK` command
             if (this.command.equals("p!extraATK")) {
-                String extraAttackRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)\\s+[yYnN]\\s+[yYnN]\\s+([yYnN]|\\d+)";
+                String extraAttackRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)\\s+[yYnN]\\s+[yYnN]\\s+([yYnN]|(\\-?\\d+))";
                 if (!this.parameters.matches(extraAttackRegex)) {
                     this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS` \n" +
                         "└ Example: `" + this.command + " 735 y n 3` calculates with 4NO and R3 TToDS \n" +
