@@ -65,12 +65,14 @@ public class DaPhatBot {
             String dpsMessages = "✅ `p!damage ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
                 "└ Gets expected output damage, ignoring talents \n"+
                 "✅ `p!extraATK baseATK 4NO pyro TToDS` \n" +
+                "└ Example: `p!extraATK 735 y n 3` calculates with 4NO and R3 TToDS \n" +
                 "└ Gets common, *external* ATK% buffs (4NO, pyro resonance, TToDS) \n" +
                 "└ Use **left, white ATK** stat on Attributes menu for baseATK \n" +
                 "└ Include/exclude calculation with y/n \n" +
                 "└ TToDS: 1-5 for refinements (integers only), y = R5, n excludes TToDS \n" +
                 "✅ `p!calcRES Enemy_RES` \n" +
                 "└ Gets enemy resistance *multiplier* → RES_Mult \n"+
+                "└ Enemy_RES is *additive* (subtract 40 when using 4VV) \n"+
                 "✅ `p!calcDEF Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
                 "└ Gets enemy defense *multiplier* → DEF_Mult";
             String beidouMessages = "✅ `p!parry ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
@@ -78,7 +80,8 @@ public class DaPhatBot {
                 "✅ `p!ult ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
                 "└ Gets expected Stormbreaker damage ";
             String notes = "Bracketed inputs are optional \n" +
-                "└ Example: `p!calcDEF 80 95` and `p!calcDEF 80 95 10` are both valid ";
+                "└ Example: `p!calcDEF 80 95` and `p!calcDEF 80 95 10` are both valid \n" +
+                "└ Negative numeric values are accepted. Use at your own risk";
 
             event.getMessage()
                 .getChannel().block()

@@ -38,31 +38,21 @@ public class GenshinCommands {
 
         // Checks for acceptable inputs
         // Acceptable number format: X, X., X.X, .X
-        String regex = "\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+";
+        String regex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)";
         Pattern pattern = Pattern.compile(regex);
         for (String nums : inputs) {
 
             // Checks for specific possible string input
             // Specifically for `p!extraATK` command
             if (this.command.equals("p!extraATK")) {
-                String extraAttackRegex = "(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)\\s+[yYnN]\\s+[yYnN]\\s+([yYnN]|\\d+)";
+                String extraAttackRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)\\s+[yYnN]\\s+[yYnN]\\s+([yYnN]|\\d+)";
                 if (!this.parameters.matches(extraAttackRegex)) {
-                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS`\n" +
-                        "⤷ Use **left, white ATK** stat on characters stats for baseATK \n" +
-                        "⤷ Include/exclude calculation with y/n \n" +
-                        "⤷ TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS";
-                    this.acceptableFormat = false;
-                    return;
-                }
-                break;
-            }
-
-            // Checks for negative number input
-            // Specifically for `p!calcRES` command
-            if (this.command.equals("p!calcRES")) {
-                String negRegex = "\\-?(\\d+|\\d+\\.|\\d+\\.\\d+|\\.\\d+)";
-                if (!nums.matches(negRegex)) {
-                    this.message = "Please use format: \n`" + this.command + " Enemy_RES`";
+                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS` \n" +
+                        "└ Example: `" + this.command + " 735 y n 3` calculates with 4NO and R3 TToDS \n" +
+                        "*Notes:* \n" +
+                        "• Use **left, white ATK** stat on characters stats for baseATK \n" +
+                        "• Include/exclude calculation with y/n \n" +
+                        "• TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -76,7 +66,17 @@ public class GenshinCommands {
                     // p!damage
                     case "p!damage": {
                         this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
-                            "⤷ Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                            "└ Example: `" + this.command + " 1935 130.6 87.0 175.1` \n" +
+                            "*Notes:* \n" +
+                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                        this.acceptableFormat = false;
+                        return;
+                    }
+
+                    // p!calcRES
+                    case "p!calcRES": {
+                        this.message = "Please use format: \n`" + this.command + " Enemy_RES` \n" +
+                            "└ Example: `" + this.command + " -10` \n";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -84,7 +84,9 @@ public class GenshinCommands {
                     // p!calcDef
                     case "p!calcDEF": {
                         this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
-                            "⤷ Bracketed inputs are optional: `DEF_Reduction`";
+                            "└ Example: `" + this.command + " 90 100` \n" +
+                            "*Notes:* \n" +
+                            "• Bracketed inputs are optional: `DEF_Reduction`";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -92,7 +94,9 @@ public class GenshinCommands {
                     // p!parry or p!ult
                     default: {
                         this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
-                            "⤷ Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                            "└ Example: `" + this.command + " 1935 130.6 87.0 175.1 13 1.05` \n" +
+                            "*Notes:* \n" +
+                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -105,7 +109,9 @@ public class GenshinCommands {
             case "p!damage": {
                 if (inputs.length < 4 || inputs.length > 6) {
                     this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
-                        "⤷ Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                        "└ Example: `" + this.command + " 1935 130.6 87.0 175.1` \n" +
+                        "*Notes:* \n" +
+                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -115,12 +121,18 @@ public class GenshinCommands {
             // p!extraATK
             case "p!extraATK": {
                 if (inputs.length != 4) {
-                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS`";
+                    this.message = "Please use format: \n`" + this.command + " baseATK 4NO pyro TToDS` \n" +
+                        "└ Example: `" + this.command + " 735 y n 3` calculates with 4NO and R3 TToDS \n" +
+                        "*Notes:* \n" +
+                        "• Use **left, white ATK** stat on characters stats for baseATK \n" +
+                        "• Include/exclude calculation with y/n \n" +
+                        "• TToDS: `1-5` for refinements (integers only), `y = R5`, `n` excludes TToDS";
                     this.acceptableFormat = false;
                     return;
                 }
 
                 // Checks if TToDS input is yYnN
+                // yY = R5, nN = do not calculate
                 if (this.inputs[3].equalsIgnoreCase("y") || this.inputs[3].equalsIgnoreCase("n")) {
                     break;
                 }
@@ -138,7 +150,8 @@ public class GenshinCommands {
             // p!calcRES
             case "p!calcRES": {
                 if (inputs.length != 1) {
-                    this.message = "Please use format: \n`" + this.command + " Enemy_RES`";
+                    this.message = "Please use format: \n`" + this.command + " Enemy_RES` \n" +
+                        "└ Example: `" + this.command + " -10` \n";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -149,7 +162,9 @@ public class GenshinCommands {
             case "p!calcDEF": {
                 if (inputs.length < 2 || inputs.length > 3) {
                     this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
-                        "⤷ Bracketed inputs are optional: `DEF_Reduction`";
+                        "└ Example: `" + this.command + " 90 100` \n" +
+                        "*Notes:* \n" +
+                        "• Bracketed inputs are optional: `DEF_Reduction`";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -160,7 +175,9 @@ public class GenshinCommands {
             default: {
                 if (inputs.length < 5 || inputs.length > 7) {
                     this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
-                        "⤷ Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                        "└ Example: `" + this.command + " 1935 130.6 87.0 175.1 13 1.05` \n" +
+                        "*Notes:* \n" +
+                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
                     this.acceptableFormat = false;
                     return;
                 }

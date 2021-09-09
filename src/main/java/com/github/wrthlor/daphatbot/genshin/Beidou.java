@@ -29,7 +29,9 @@ public class Beidou extends GenshinDamageCalculator {
     public Beidou(double attack, double dmgBonus, double cRate, double cDmg, double level, double resMult, double defMult) {
         this.totalAttack = attack;
         this.damagePercent = dmgBonus;
-        this.critRate = cRate;
+        // If cRate is below zero, treat as 0%
+        // If cRate is above hundred, treat as 100%
+        this.critRate = cRate < 0 ? 0 : Math.min(cRate, 100);
         this.critDamage = cDmg;
         this.talent = (int) level;
         this.resistanceMultiplier = resMult;

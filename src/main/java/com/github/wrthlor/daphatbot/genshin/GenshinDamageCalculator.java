@@ -25,7 +25,9 @@ public class GenshinDamageCalculator {
     public GenshinDamageCalculator(double attack, double dmgBonus, double cRate, double cDmg, double resMult, double defMult) {
         this.totalAttack = attack;
         this.damagePercent = dmgBonus;
-        this.critRate = cRate;
+        // If cRate is below zero, treat as 0%
+        // If cRate is above hundred, treat as 100%
+        this.critRate = cRate < 0 ? 0 : Math.min(cRate, 100);
         this.critDamage = cDmg;
         this.resistanceMultiplier = resMult;
         this.defenseMultiplier = defMult;
@@ -56,7 +58,7 @@ public class GenshinDamageCalculator {
     // where CRIT_multiplier = (1 + (min(Crit_Rate, 100%) * Crit_Damage))
     public int calculateAverageDamage() {
         double outgoingDamage = this.calculateBase();
-        double critMultiplier = 1 + Math.min(this.critRate / 100, 1) * (this.critDamage / 100);
+        double critMultiplier = 1 + (this.critRate / 100) * (this.critDamage / 100);
 
         return (int) (outgoingDamage * critMultiplier);
     }
