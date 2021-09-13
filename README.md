@@ -26,5 +26,6 @@ Done in Java, utilizing Discord4J
 * [Heroku](https://www.heroku.com/home)
 <!-- Game specific -->
 * Genshin Impact
+  * [Genshin Impact Wiki](https://genshin-impact.fandom.com/wiki/Genshin_Impact_Wiki)
   * [Keqing Mains Damage Formula](https://library.keqingmains.com/mechanics/combat/damage-formula)
-  * [Beidou Mains Discord](https://discord.gg/thecrux)
+  * [Beidou Mains Discord](https://discord.io/beidou)
