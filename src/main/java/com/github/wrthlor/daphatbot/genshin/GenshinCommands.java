@@ -68,7 +68,8 @@ public class GenshinCommands {
                         this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
                             "└ Example: `" + this.command + " 1935 130.6 87.0 175.1` \n" +
                             "*Notes:* \n" +
-                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult` \n" +
+                            "• Do not include the actual brackets!";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -86,7 +87,8 @@ public class GenshinCommands {
                         this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
                             "└ Example: `" + this.command + " 90 100` \n" +
                             "*Notes:* \n" +
-                            "• Bracketed inputs are optional: `DEF_Reduction`";
+                            "• Bracketed inputs are optional: `DEF_Reduction` \n" +
+                            "• Do not include the actual brackets!";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -96,7 +98,8 @@ public class GenshinCommands {
                         this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
                             "└ Example: `" + this.command + " 1935 130.6 87.0 175.1 13 1.05` \n" +
                             "*Notes:* \n" +
-                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                            "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult` \n" +
+                            "• Do not include the actual brackets!";
                         this.acceptableFormat = false;
                         return;
                     }
@@ -111,7 +114,8 @@ public class GenshinCommands {
                     this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg [RES_Mult [DEF_Mult]]` \n" +
                         "└ Example: `" + this.command + " 1935 130.6 87.0 175.1` \n" +
                         "*Notes:* \n" +
-                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult` \n" +
+                        "• Do not include the actual brackets!";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -164,7 +168,8 @@ public class GenshinCommands {
                     this.message = "Please use format: \n`" + this.command + " Char_lvl Enemy_lvl [DEF_Reduction]` \n" +
                         "└ Example: `" + this.command + " 90 100` \n" +
                         "*Notes:* \n" +
-                        "• Bracketed inputs are optional: `DEF_Reduction`";
+                        "• Bracketed inputs are optional: `DEF_Reduction` \n" +
+                        "• Do not include the actual brackets!";
                     this.acceptableFormat = false;
                     return;
                 }
@@ -177,7 +182,8 @@ public class GenshinCommands {
                     this.message = "Please use format: \n`" + this.command + " ATK DMG% CRate CDmg Talent_lvl [RES_Mult [DEF_Mult]]` \n" +
                         "└ Example: `" + this.command + " 1935 130.6 87.0 175.1 13 1.05` \n" +
                         "*Notes:* \n" +
-                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult`";
+                        "• Bracketed inputs are optional: `RES_Mult`, `DEF_Mult` \n" +
+                        "• Do not include the actual brackets!";
                     this.acceptableFormat = false;
                     return;
                 }

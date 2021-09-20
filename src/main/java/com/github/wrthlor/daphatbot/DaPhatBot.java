@@ -81,6 +81,7 @@ public class DaPhatBot {
                 "└ Gets expected Stormbreaker damage ";
             String notes = "Bracketed inputs are optional \n" +
                 "└ Example: `p!calcDEF 80 95` and `p!calcDEF 80 95 10` are both valid \n" +
+                "└ Do not include the actual brackets! \n" +
                 "└ Negative numeric values are accepted. Use at your own risk";
 
             event.getMessage()
